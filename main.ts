@@ -21,3 +21,10 @@ const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 mkdirSync(outDir, { recursive: true });
 const bytes = readFileSync(join(here, 'entry.png'));
 writeFileSync(join(outDir, 'entry.png'), bytes);
+// Sanity check: the grader runs the entry twice and the two runs must
+// write identical bytes, so fail loudly here rather than shipping a
+// truncated copy if the write ever goes wrong.
+const written = readFileSync(join(outDir, 'entry.png'));
+if (written.length !== bytes.length || !written.equals(bytes)) {
+  throw new Error('entry.png copy mismatch');
+}
